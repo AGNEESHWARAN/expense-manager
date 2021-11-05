@@ -3,7 +3,7 @@ package splitwise;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Manager {
+public class Manager extends AbstractManager{
 
 	EventManager em = new EventManager();
 	
@@ -167,6 +167,10 @@ public class Manager {
 		}
 		return res;
 	}
+
+
+
+
 	
 }
 

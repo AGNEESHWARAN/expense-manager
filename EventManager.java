@@ -1,7 +1,7 @@
 package splitwise;
 
 import java.sql.*;
-public class EventManager {
+public class EventManager extends AbstractEvent {
 	
 		DatabaseManager dm  = new DatabaseManager();
 		String sql;
