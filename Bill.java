@@ -89,4 +89,8 @@ public class Bill {
 	public void setTotal(double total) {
 		this.total=total;
 	}
+	public void setType(String string) {
+		this.shareType=string;
+		
+	}
 }

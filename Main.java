@@ -27,13 +27,14 @@ public class Main {
 	
 		try {
 		while(status) {
-			
 			System.out.println("1. ADD USER \n"
 					+ "2. CREATE NEW GROUP \n"
 					+ "3. CREATE EVENT \n"
 					+ "4. ADD RECEPT \n"
-					+ ""
-					
+					+ "5. VIEW GROUP RECORDS \n"
+					+ "6. VIEW EXPENSES \n"
+					+ "7. CREDITS \n"
+					+ "8. GET DEBTS \n"
 					+ "ENTER YOUR CHOICE:\n");
 			
 			while(true) {
@@ -103,7 +104,7 @@ public class Main {
 				int id;
 				String str;
 				if(event.getType().contains("g")) {
-					
+					manager.getAllGroup();
 					while(true) {
 						try {
 							System.out.println("group id:");
@@ -122,7 +123,14 @@ public class Main {
 						}
 					}
 				}else if(event.getType().contains("i")) {
+					for(User usr:manager.getAllUser()) {
+						System.out.println(usr.getId()+"\t"+
+								usr.getName()+"\t"+
+								usr.getGender()+"\t"+
+								usr.getMobileNumber());
+					}
 					while(true) {
+						
 						try {
 							System.out.println("user id");
 							str = scn.next();
@@ -155,9 +163,12 @@ public class Main {
 				parameters.put("notes", "String");
 				parameters.put("share_type_group/individual", "String");
 				parameters.put("event_id", "int");
+				manager.getAllEvent();
 				Bill bill =null;
 				while(true) {
 					bill = (Bill) prompt(parameters, new Bill(), null);
+					if(manager.getEvent(bill.getEventId()).getType().contains("i"))
+						bill.setType("i");
 					if((bill.getShareType().contains("g") || bill.getShareType().contains("i")) && (bill.getType().contains("p") || bill.getType().contains("l")))
 						break;
 					System.out.println("invalid shareill type it should  be either ('group' or 'g') or ('individual' or 'i')"
@@ -197,10 +208,10 @@ public class Main {
 						System.out.println(bill.getShareType());
 						
 						if(bill.getShareType().contains("g")) {
-							System.out.println("pass @1");
+					
 							GroupEvent evnt = (GroupEvent) manager.getEvent(bill.getEventId());
 							Group group = ((GroupEvent)evnt).getGroup();
-							System.out.println("pass @2");
+							
 							ArrayList<Double> amt = new ArrayList<Double>();
 							ArrayList<Double> perc = new ArrayList<Double>();
 							System.out.println("1. SPLIT EQUAL\n"
@@ -241,8 +252,13 @@ public class Main {
 												if(s.equalsIgnoreCase("nil")) {
 													break;
 												}
+												while(Double.parseDouble(s)>total) {
+													System.out.println(" payed amount : bal-"+total);
+													s = scn.next();
+												}
 												amt.add(Double.parseDouble(s));
 												total-=Double.parseDouble(s);
+												
 												usrs[user_c]=U.getId();
 												user_c++;
 												break;
@@ -253,10 +269,14 @@ public class Main {
 									}else if(spl ==2) {
 										while(true) {
 											try {
-												System.out.println(" payed amount : bal -"+total);
+												System.out.println(" payed amount : bal -"+total +" " +(100-shar));
 												String s = scn .next();
 												if(s.equalsIgnoreCase("nil")) {
 													break;
+												}
+												while(Double.parseDouble(s)>total) {
+													System.out.println(" payed amount : bal-"+total +" "+(100-shar));
+													s = scn.next();
 												}
 												amt.add(Double.parseDouble(s));
 												total-=Double.parseDouble(s);
@@ -308,16 +328,14 @@ public class Main {
 										Iterator<Integer> l2_key = res2.keySet().iterator();
 										while(l2_key.hasNext()) {
 											int lk_2=l2_key.next();
+											
 											manager.addTOSplitRecord(lk_1, lk_2, res2.get(lk_2), billId);
 											
 										}
 									}
 									
-								}
-
-								
-								
-								
+								}						
+												
 							if(spl==2) {
 								Double r;
 								total = bill.getTotal();
@@ -362,16 +380,14 @@ public class Main {
 								}
 								//add  records to Splitwise DB
 							}
-							
-							
+		
 						}
 						//individeal purchase
 	
 						else {
-					
 							Event evnt = manager.getEvent(bill.getEventId());
 							User usr = ((IndividualEvent) evnt).getUser();
-							System.out.println("USER INT HTIS EVENT : "+usr.getId() +"  "+usr.getName());
+							System.out.println("USER IN THIS EVENT : "+usr.getId() +"  "+usr.getName());
 							total = bill.getTotal();
 							while(true) {
 								try {
@@ -389,12 +405,15 @@ public class Main {
 								} catch (Exception e) {
 									System.out.println("try again!"+ e.getMessage());
 								}
+		
 							}
-							
-												
+																			
 						}
 					
 					}else if(bill.getType().equalsIgnoreCase("lend") || bill.getType().equalsIgnoreCase("l") ) {
+						for(User u : manager.getAllUser()) {
+							System.out.println(u.getId() +" ---"+ u.getName());
+						}
 						Event evnt = manager.getEvent(bill.getEventId());
 						total = bill.getTotal();
 						String s;
@@ -424,12 +443,19 @@ public class Main {
 								}
 							}
 						}else if(evnt instanceof IndividualEvent) {
+							User luser=((IndividualEvent)evnt).getUser();
+							for(User u:manager.getAllUser()) {
+								if(luser.getId() != u.getId()) {
+									System.out.println(u.getId() +" ---"+ u.getName());
+
+								}
+							}
 							while(true) {
 								try {										
 									System.out.println("enter recipient person id:");
 									s = scn.next();
 									rid = Integer.parseInt(s);
-									User luser=((IndividualEvent)evnt).getUser();
+									
 									User ruser=manager.getUser(rid);
 									System.out.println("Toal amount given :");
 									s = scn.next();
@@ -451,15 +477,74 @@ public class Main {
 				}
 				
 				break;
-				
+			case 5:
+				manager.getAllGroup();
+				break;
+			
 			case 6:
-				Event evnt = manager.getEvent(2);
-				System.out.println(evnt instanceof GroupEvent);
+				int usId;
+				while(true) {
+					try {
+						System.out.println("enter user Id :");
+						String s = scn.next();
+						usId=Integer.parseInt(s);
+						break;
+					} catch (Exception e) {
+						System.out.println("wrong format try again!");
+					}
+				}
+				Iterator<Integer> it =new ExpenseManager().gettAllExpenses(usId).keySet().iterator();
+				while(it.hasNext()) {
+					Event evnt = manager.getEvent(it.next());
+					System.out.println("\n\t"+evnt.getName() +"   amount spent  "+new ExpenseManager().gettAllExpenses(usId).get(evnt.getId()) );
+					
+				}
+				break;
+			
+			case 7:
+				int uId;
+				while(true) {
+					try {
+						System.out.println("enter user Id :");
+						String s = scn.next();
+						uId=Integer.parseInt(s);
+						break;
+					} catch (Exception e) {
+						System.out.println("wrong format try again!");
+					}
+				}
+				User usr;
+				Iterator<Integer> ite = new ExpenseManager().getAllCredits(uId).keySet().iterator();
+				while(ite.hasNext()) {
+					usr = manager.getUser(ite.next());
+					System.out.println("\n\t"+usr.getId()+"   "+usr.getName() +"   " +new  ExpenseManager().getAllCredits(uId).get(usr.getId())+"\n");
+				}
+				break;
+			case 8
+			:int usrId;
+			while(true) {
+				try {
+					System.out.println("enter user Id :");
+					String s = scn.next();
+					usrId=Integer.parseInt(s);
+					break;
+				} catch (Exception e) {
+					System.out.println("wrong format try again!");
+				}
+				
+			}
+			User u;
+			Iterator<Integer> iter = new ExpenseManager().getAllDebts(usrId).keySet().iterator();
+			while(iter.hasNext()) {
+				u = manager.getUser(iter.next());
+				System.out.println("\n\t"+u.getId()+"   "+u.getName() +"   " +new  ExpenseManager().getAllDebts(usrId).get(u.getId())+"\n");
+			}
+				
 				break;
 				
 			default:
 				status = false;
-				System.out.println("Exiting!");
+				System.out.println("Exit!");
 				break;
 				}
 				
@@ -556,7 +641,7 @@ public class Main {
 				stringDataType.replace("share_type_group/individual","individual");
 		
 			returnObj = new Bill(stringDataType.get("type_purchase/lend"), stringDataType.get("share_type_group/individual"), stringDataType.get("notes"), intDataType.get("event_id"));
-			System.out.println("$$$$$$$ "+((Bill) returnObj).getType() +" "+((Bill) returnObj).getShareType());
+			
 		}else if (returnObj instanceof Purchase) {
 			returnObj = new Purchase(stringDataType.get("product_name"), stringDataType.get("type"), doubleDataType.get("amount"));
 		}

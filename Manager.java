@@ -84,7 +84,21 @@ public class Manager extends AbstractManager{
 		}
 		return group;
 	}
-	
+	public void getAllGroup() {
+		try {
+			for(Group g : gm.getAllGroup()) {
+			
+				System.out.println(g.getGroupId() +"\t"+g.getGroupName()+"\n");
+				System.out.println("\tID\tNAME\tGENDER\tPHONE NUMBER");
+				for(User u: g.getUsers()) {
+					
+					System.out.println("\t"+u.getId() +"\t"+u.getName()+"\t"+u.getGender()+"\t"+u.getMobileNumber()+"\n");
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
 	public int addBill(Bill bill) {
 		int res = 0;
 		try {
@@ -131,9 +145,7 @@ public class Manager extends AbstractManager{
 		}catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println("test");
-		System.out.println(event);
-		System.out.println("test2");
+		
 		return event;
 		
 	}
@@ -144,6 +156,16 @@ public class Manager extends AbstractManager{
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
+		}
+	}
+	
+	public void getAllEvent() {
+		try {
+			for(Event e: em.getAllEvent()) {
+				System.out.println(e.getId()+"-----"+e.getName()+"-----"+e.getType());
+			}
+		} catch (SQLException e) {
+		e.printStackTrace();
 		}
 	}
 	

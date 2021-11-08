@@ -48,5 +48,39 @@ public class GroupManager {
 	       	group=new Group(id,rs2.getString(2),users);
 		return group;
 	}
+	public ArrayList<Group> getAllGroup() throws SQLException{
+		ArrayList<Group> groups = new ArrayList<Group>();
+		ArrayList<User> users = new ArrayList<User>();
+		sql = "select * from Groups_table";
+		ResultSet st = dm.getRecords(sql);
+		
+		int uId;
+		int gId;
+		String groupName;
+		while(st.next()) {
+			gId = st.getInt(1);
+			groupName = st.getString(2);
+			
+			sql = "select * from Group_members where group_id='"+gId+"'";
+			ResultSet rs2 = dm.getRecords(sql);
+			while(rs2.next()) {
+				uId= rs2.getInt(3);
+				sql ="select * from User where user_id = '"+uId+"'";
+				ResultSet st3 = dm.getRecords(sql);
+				st3.next();
+				
+				users.add(new User(uId,st3.getString(2), st3.getInt(3), st3.getString(5), st3.getString(4), st3.getString(6)));
+					
+				
+				
+			}
+			
+			groups.add(new Group(gId, groupName, new ArrayList<User>(users)));
+			users.clear();
+		}
+	
+	return groups;
+	}
+	
 	
 }

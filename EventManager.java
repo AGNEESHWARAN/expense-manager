@@ -1,6 +1,7 @@
 package splitwise;
 
 import java.sql.*;
+import java.util.ArrayList;
 public class EventManager extends AbstractEvent {
 	
 		DatabaseManager dm  = new DatabaseManager();
@@ -91,6 +92,16 @@ public class EventManager extends AbstractEvent {
 			return event;
 		}
 		
-		
+		public ArrayList<Event> getAllEvent() throws SQLException{
+			ArrayList<Event> events = new ArrayList<Event>();
+			sql = "select * from Events_table";
+			ResultSet st = dm.getRecords(sql);
+			while(st.next()) {
+				events.add(new Event(st.getInt(1), st.getString(2), st.getString(3)));
+			}
+			
+			
+			return events;
+		}
 	
 }
