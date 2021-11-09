@@ -33,7 +33,7 @@ public class GroupManager {
 		return groupId;
 		}
 	
-	public Group getGroup(int id) throws SQLException {
+	public Group getGroup(int id) throws SQLException, UserException, GroupException {
 		Group group =null;
 		ArrayList <User> users = new ArrayList<User>();
 		sql="select * from Group_members where group_id='"+id+"'";
@@ -46,7 +46,10 @@ public class GroupManager {
 		ResultSet rs2 = dm.getRecords(sql);
 		if(rs2.next())
 	       	group=new Group(id,rs2.getString(2),users);
-		return group;
+		if(new GroupException().validate(group))
+			return group;
+		else
+			throw new GroupException("NO group Found!");
 	}
 	public ArrayList<Group> getAllGroup() throws SQLException{
 		ArrayList<Group> groups = new ArrayList<Group>();
@@ -82,5 +85,20 @@ public class GroupManager {
 	return groups;
 	}
 	
+	
+}
+
+@SuppressWarnings("serial")
+class GroupException extends Exception{
+	GroupException(){}
+	GroupException(String message){
+		super(message);
+	}
+	
+	boolean validate(Group group) {
+		if(group != null)
+			return true;
+		return false;
+	}
 	
 }

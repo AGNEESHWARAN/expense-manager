@@ -87,7 +87,7 @@ public class ExpenseManager {
 		return res;
 	}
 	
-	public HashMap<Integer,Double> getAllCredits(int userId) throws SQLException{
+	public HashMap<Integer,Double> getAllCredits(int userId) throws SQLException, ExpenseException{
 		HashMap<Integer,Double> res = new HashMap<Integer,Double>();
 		sql ="select * from Split where payee ='"+userId+"'";
 		ResultSet rs = dm.getRecords(sql);
@@ -101,9 +101,11 @@ public class ExpenseManager {
 			res.put(rs.getInt(3),rs.getDouble(4));
 			
 		}
+		if(res.isEmpty())
+			throw new ExpenseException("Record not found!");
 		return res;
 	}
-	public HashMap<Integer,Double> getAllDebts(int userId) throws SQLException{
+	public HashMap<Integer,Double> getAllDebts(int userId) throws SQLException, ExpenseException{
 		HashMap<Integer,Double> res = new HashMap<Integer,Double>();
 		sql ="select * from Split where payer ='"+userId+"'";
 		ResultSet rs = dm.getRecords(sql);
@@ -117,10 +119,12 @@ public class ExpenseManager {
 			res.put(rs.getInt(2),rs.getDouble(4));
 			
 		}
+		if(res.isEmpty())
+			throw new ExpenseException("Records not found!");
 		return res;
 	}
 	
-	public HashMap<Integer,Double> gettAllExpenses(int usrId) throws SQLException{
+	public HashMap<Integer,Double> gettAllExpenses(int usrId) throws SQLException, ExpenseException{
 		HashMap<Integer,Double> res = new HashMap<Integer,Double>();
 		sql ="select * from Expenses where user_id='"+usrId+"'";
 		ResultSet st = dm.getRecords(sql);
@@ -139,7 +143,23 @@ public class ExpenseManager {
 			res.put(eventId,amount);
 		}
 		}
-		
+		if(res.isEmpty())
+			throw new ExpenseException("No records found!!");
 		return res;
+	}
+}
+
+@SuppressWarnings("serial")
+class ExpenseException extends Exception{
+	
+	ExpenseException(){}
+	ExpenseException(String message){
+		super(message);
+	}
+	
+	boolean validate(Object obj) {
+		if(obj!=null)
+			return true;
+		return false;
 	}
 }

@@ -2,6 +2,7 @@ package splitwise;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Manager extends AbstractManager{
 
@@ -37,7 +38,9 @@ public class Manager extends AbstractManager{
 	
 	public User getUser(int id) {
 		User user=null;
+		System.out.println("*");
 		try {
+			
 			user = um.getUserById(id);
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -77,7 +80,12 @@ public class Manager extends AbstractManager{
 	public Group getGroup(int id) {
 		Group group=null;
 		try {
-			group=gm.getGroup(id);
+			try {
+				group=gm.getGroup(id);
+			} catch (UserException | GroupException e) {
+				
+				e.printStackTrace();
+			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -191,8 +199,33 @@ public class Manager extends AbstractManager{
 	}
 
 
-
-
+	public HashMap<Integer,Double> getAllExpenses(int userId){
+		try {
+			return exm.gettAllExpenses(userId);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		
+		}
+		return null;
+	}
+	
+	public HashMap<Integer,Double> getAllDebts(int userId){
+		try {
+			return exm.getAllDebts(userId);
+		} catch (SQLException | ExpenseException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
+	public HashMap<Integer,Double> getAllCredits(int userId){
+		try {
+			return exm.getAllCredits(userId);
+		} catch (SQLException | ExpenseException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
 	
 }
 

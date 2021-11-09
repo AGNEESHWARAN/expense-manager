@@ -27,7 +27,7 @@ public class Main {
 	
 		try {
 		while(status) {
-			System.out.println("1. ADD USER \n"
+			System.out.println("\n\n1. ADD USER \n"
 					+ "2. CREATE NEW GROUP \n"
 					+ "3. CREATE EVENT \n"
 					+ "4. ADD RECEPT \n"
@@ -165,16 +165,21 @@ public class Main {
 				parameters.put("event_id", "int");
 				manager.getAllEvent();
 				Bill bill =null;
-				while(true) {
-					bill = (Bill) prompt(parameters, new Bill(), null);
-					if(manager.getEvent(bill.getEventId()).getType().contains("i"))
-						bill.setType("i");
-					if((bill.getShareType().contains("g") || bill.getShareType().contains("i")) && (bill.getType().contains("p") || bill.getType().contains("l")))
-						break;
-					System.out.println("invalid shareill type it should  be either ('group' or 'g') or ('individual' or 'i')"
-							+ "or invalid bill type it should be either ('purchase' or 'p') or ('lend' or 'l')");
+				try {
+					while(true) {
+						bill = (Bill) prompt(parameters, new Bill(), null);
+						if(manager.getEvent(bill.getEventId()).getType().contains("i"))
+							bill.setType("i");
+						if((bill.getShareType().contains("g") || bill.getShareType().contains("i")) && (bill.getType().contains("p") || bill.getType().contains("l")))
+							break;
+						System.out.println("invalid shareill type it should  be either ('group' or 'g') or ('individual' or 'i')"
+								+ "or invalid bill type it should be either ('purchase' or 'p') or ('lend' or 'l')");
+					}
+				} catch (Exception e2) {
+					System.out.println("Try again! problem with event ID");
+					break;
 				}
-		
+				System.out.println("bill ---"+bill);
 				if(bill !=null) {
 					
 					//add bill to bill BD
@@ -493,12 +498,14 @@ public class Main {
 						System.out.println("wrong format try again!");
 					}
 				}
-				Iterator<Integer> it =new ExpenseManager().gettAllExpenses(usId).keySet().iterator();
-				while(it.hasNext()) {
-					Event evnt = manager.getEvent(it.next());
-					System.out.println("\n\t"+evnt.getName() +"   amount spent  "+new ExpenseManager().gettAllExpenses(usId).get(evnt.getId()) );
-					
-				}
+				try {
+					Iterator<Integer> it =manager.getAllExpenses(usId).keySet().iterator();
+					while(it.hasNext()) {
+						Event evnt = manager.getEvent(it.next());
+						System.out.println("\n\t"+evnt.getName() +"   amount spent  "+new ExpenseManager().gettAllExpenses(usId).get(evnt.getId()) );
+						
+					}
+				} catch (Exception e1) {}
 				break;
 			
 			case 7:
@@ -513,15 +520,19 @@ public class Main {
 						System.out.println("wrong format try again!");
 					}
 				}
-				User usr;
-				Iterator<Integer> ite = new ExpenseManager().getAllCredits(uId).keySet().iterator();
-				while(ite.hasNext()) {
-					usr = manager.getUser(ite.next());
-					System.out.println("\n\t"+usr.getId()+"   "+usr.getName() +"   " +new  ExpenseManager().getAllCredits(uId).get(usr.getId())+"\n");
+				try {
+					User usr;
+					Iterator<Integer> ite = manager.getAllCredits(uId).keySet().iterator();
+					while(ite.hasNext()) {
+						usr = manager.getUser(ite.next());
+						System.out.println("\n\t"+usr.getId()+"   "+usr.getName() +"   " +new  ExpenseManager().getAllCredits(uId).get(usr.getId())+"\n");
+					}
+				} catch (Exception e1) {
+					System.out.println(e1.getMessage());
 				}
 				break;
-			case 8
-			:int usrId;
+			case 8:
+				int usrId;
 			while(true) {
 				try {
 					System.out.println("enter user Id :");
@@ -533,12 +544,17 @@ public class Main {
 				}
 				
 			}
-			User u;
-			Iterator<Integer> iter = new ExpenseManager().getAllDebts(usrId).keySet().iterator();
-			while(iter.hasNext()) {
-				u = manager.getUser(iter.next());
-				System.out.println("\n\t"+u.getId()+"   "+u.getName() +"   " +new  ExpenseManager().getAllDebts(usrId).get(u.getId())+"\n");
-			}
+				try {
+					User u;
+					System.out.println(usrId);
+					Iterator<Integer> iter = manager.getAllDebts(usrId).keySet().iterator();
+					while(iter.hasNext()) {
+						u = manager.getUser(iter.next());
+						System.out.println("\n\t"+u.getId()+"   "+u.getName() +"   " +new  ExpenseManager().getAllDebts(usrId).get(u.getId())+"\n");
+					}
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				
 				break;
 				
@@ -611,7 +627,7 @@ public class Main {
 					break;
 					
 				}
-			}else if(dataTypes.get(i).contains("double") || dataTypes.get(i).contains("Double")){
+			}else if(dataTypes.get(i).contains("ouble") || dataTypes.get(i).contains("Double")){
 				while(true) {
 					System.out.println(fields.get(i)+" :");
 						try{
@@ -625,28 +641,33 @@ public class Main {
 				}
 			}
 		}
-		if (returnObj instanceof User) {
-			returnObj = new User(stringDataType.get("name"), intDataType.get("age"), stringDataType.get("gender"), stringDataType.get("phone"), stringDataType.get("email"));
-		}else if(returnObj instanceof Event) {
-			if(stringDataType.get("event_type_ group/individual").contains("p"))
-				returnObj = new GroupEvent(stringDataType.get("name"),stringDataType.get("event_type_ group/individual"));
-			else 
-				returnObj =new IndividualEvent(stringDataType.get("name"),stringDataType.get("event_type_ group/individual"));
+		try {
+			if (returnObj instanceof User) {
+				returnObj = new User(stringDataType.get("name"), intDataType.get("age"), stringDataType.get("gender"), stringDataType.get("phone"), stringDataType.get("email"));
+			}else if(returnObj instanceof Event) {
+				if(stringDataType.get("event_type_ group/individual").contains("p"))
+					returnObj = new GroupEvent(stringDataType.get("name"),stringDataType.get("event_type_ group/individual"));
+				else 
+					returnObj =new IndividualEvent(stringDataType.get("name"),stringDataType.get("event_type_ group/individual"));
+				
+			}else if(returnObj instanceof Group) {
+				
+				returnObj= new Group(stringDataType.get("name"),(ArrayList<User>)objectParameters);
+			}else if (returnObj instanceof Bill) {
+				if(stringDataType.get("type_purchase/lend").contains("l") || stringDataType.get("type_purchase/lend").contains("end"))
+					stringDataType.replace("share_type_group/individual","individual");
 			
-		}else if(returnObj instanceof Group) {
+				returnObj = new Bill(stringDataType.get("type_purchase/lend"), stringDataType.get("share_type_group/individual"), stringDataType.get("notes"), intDataType.get("event_id"));
+				
+			}else if (returnObj instanceof Purchase) {
+				returnObj = new Purchase(stringDataType.get("product_name"), stringDataType.get("type"), doubleDataType.get("amount"));
+			}
 			
-			returnObj= new Group(stringDataType.get("name"),(ArrayList<User>)objectParameters);
-		}else if (returnObj instanceof Bill) {
-			if(stringDataType.get("type_purchase/lend").contains("l") || stringDataType.get("type_purchase/lend").contains("end"))
-				stringDataType.replace("share_type_group/individual","individual");
-		
-			returnObj = new Bill(stringDataType.get("type_purchase/lend"), stringDataType.get("share_type_group/individual"), stringDataType.get("notes"), intDataType.get("event_id"));
-			
-		}else if (returnObj instanceof Purchase) {
-			returnObj = new Purchase(stringDataType.get("product_name"), stringDataType.get("type"), doubleDataType.get("amount"));
+			return returnObj;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
-		
-		return returnObj;
+		return null;
 	}
 	
 	 

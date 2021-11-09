@@ -59,7 +59,7 @@ public class EventManager extends AbstractEvent {
 		
 		
 		
-		public Event getEvent(int id) {
+		public Event getEvent(int id) throws EventException {
 			Event event=null;
 			
 			try {
@@ -88,8 +88,10 @@ public class EventManager extends AbstractEvent {
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
-			
-			return event;
+			if(new EventException().validate(event))
+				return event;
+			else
+				throw new EventException("Event not registered");
 		}
 		
 		public ArrayList<Event> getAllEvent() throws SQLException{
@@ -105,3 +107,18 @@ public class EventManager extends AbstractEvent {
 		}
 	
 }
+
+@SuppressWarnings("serial")
+class EventException extends  Exception{
+	EventException() {}
+	
+	EventException(String message) {
+		super(message);
+	}
+	public boolean validate(Event event) {
+		if(event !=null)
+			return true;
+		return false;
+	}
+}
+

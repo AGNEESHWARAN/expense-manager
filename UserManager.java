@@ -27,7 +27,7 @@ public class UserManager  {
 		return dm.addRecord(sql);
 	}
 
-	public User getUserById(int id) throws SQLException {
+	public User getUserById(int id) throws SQLException , UserException {
 		User user = null;
         String sql="select * from User where user_id="+id;
         ResultSet rs = dm.getRecords(sql);
@@ -40,7 +40,10 @@ public class UserManager  {
 					rs.getString(4),
 					rs.getString(6));
 		}
-		return user;
+		if(new UserException().validate(user))
+			return user;
+		else
+			throw new UserException("User Not Registered!");
 		
 	}
 	
@@ -48,9 +51,7 @@ public class UserManager  {
 		ArrayList<User> users = new ArrayList<User>();
 		User user=null;
 		String sql ="select * from User";
-		
-		
-		
+
 		ResultSet rs = dm.getRecords(sql);
 		while(rs.next()) {
 			user = new  User(rs.getInt(1),
@@ -68,5 +69,20 @@ public class UserManager  {
 	
 }
 
+@SuppressWarnings("serial")
+class UserException extends Exception{
+	public UserException() {}
+	UserException(String message){
+		super(message);
+	}
+	
+	boolean validate(User user) {
+		
+		if(user != null)
+			return true;
+		return false;
+	}
+	
+}
 
 

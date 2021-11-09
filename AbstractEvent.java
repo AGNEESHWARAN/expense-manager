@@ -9,5 +9,5 @@ public abstract class AbstractEvent {
 	
 	abstract public Event getEvent(String name);
 	
-	abstract public Event getEvent(int id);
+	abstract public Event getEvent(int id) throws EventException;
 }
