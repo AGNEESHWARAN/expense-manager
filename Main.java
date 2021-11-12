@@ -1,17 +1,8 @@
 package splitwise;
 
-
-
-
 import java.util.HashMap;
 
 import java.util.Scanner;
-
-
-
-
-
-
 
 public class Main {
 
