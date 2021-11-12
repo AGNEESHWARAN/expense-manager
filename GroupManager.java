@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 
 public class GroupManager {
-	static final String DB_URL = "jdbc:mysql://localhost/splitwise";
-	static final String USER = "guest";
-	static final String PASS = "Guest@123+";
 	private String sql;
-	private DatabaseManager dm = new DatabaseManager();
+	CustomList parameters = new CustomList();
 	
 	public int createGroup(String name) throws  ClassNotFoundException, SQLException {
-		sql = "insert into Groups_table(group_name) values('"+name+"')";
-		int res =dm.addRecord(sql);
+		parameters.add("string", "group_name", name);
+		int res =DatabaseManager.addRecord(DatabaseManager.insertSQL(parameters, "Groups_table") );
+		parameters.clear();
 		return res;
 	}
 	
 	public void addMembers(int groupId,int memberId) throws SQLException {
-		sql="insert into Group_members(group_id,user_id) values('"+groupId+"','"+memberId+"')";
-		dm.addRecord(sql);
+		parameters.add("int", "group_id,", groupId);
+		parameters.add("int", "user_id", memberId);
+		DatabaseManager.addRecord(DatabaseManager.insertSQL(parameters, "Group_members"));
+		parameters.clear();
 		System.out.println("User Added !!");
 	}
 	
@@ -26,8 +26,10 @@ public class GroupManager {
 		int groupId = group.getGroupId();
 		ArrayList<User> users = group.getUsers();
 		for(User i : users) {
-			sql="insert into Group_members(group_id,user_id) values('"+groupId+"','"+i.getId()+"')";
-			dm.addRecord(sql);
+			parameters.add("int", "group_id", groupId);
+			parameters.add("int", "user_id", i.getId());
+			DatabaseManager.addRecord(DatabaseManager.insertSQL(parameters, "Group_members"));
+			parameters.clear();
 			}
 		System.out.println("group Added!!");
 		return groupId;
@@ -37,13 +39,13 @@ public class GroupManager {
 		Group group =null;
 		ArrayList <User> users = new ArrayList<User>();
 		sql="select * from Group_members where group_id='"+id+"'";
-		ResultSet rs =dm.getRecords(sql);
+		ResultSet rs =DatabaseManager.getRecords(sql);
 		while(rs.next()) {
 	        User user = new UserManager().getUserById(rs.getInt(3)) ;	
 	        users.add(user);
 		}
 		sql="select * from Groups_table where group_id='"+id+"'";
-		ResultSet rs2 = dm.getRecords(sql);
+		ResultSet rs2 = DatabaseManager.getRecords(sql);
 		if(rs2.next())
 	       	group=new Group(id,rs2.getString(2),users);
 		if(new GroupException().validate(group))
@@ -55,7 +57,7 @@ public class GroupManager {
 		ArrayList<Group> groups = new ArrayList<Group>();
 		ArrayList<User> users = new ArrayList<User>();
 		sql = "select * from Groups_table";
-		ResultSet st = dm.getRecords(sql);
+		ResultSet st = DatabaseManager.getRecords(sql);
 		
 		int uId;
 		int gId;
@@ -65,17 +67,14 @@ public class GroupManager {
 			groupName = st.getString(2);
 			
 			sql = "select * from Group_members where group_id='"+gId+"'";
-			ResultSet rs2 = dm.getRecords(sql);
+			ResultSet rs2 = DatabaseManager.getRecords(sql);
 			while(rs2.next()) {
 				uId= rs2.getInt(3);
 				sql ="select * from User where user_id = '"+uId+"'";
-				ResultSet st3 = dm.getRecords(sql);
+				ResultSet st3 = DatabaseManager.getRecords(sql);
 				st3.next();
-				
 				users.add(new User(uId,st3.getString(2), st3.getInt(3), st3.getString(5), st3.getString(4), st3.getString(6)));
 					
-				
-				
 			}
 			
 			groups.add(new Group(gId, groupName, new ArrayList<User>(users)));

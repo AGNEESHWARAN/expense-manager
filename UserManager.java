@@ -6,31 +6,26 @@ import java.util.Scanner;
 
 public class UserManager  {
 	final Scanner scan = new Scanner(System.in);
-	DatabaseManager dm = new DatabaseManager();
-	
-	static final String DB_URL = "jdbc:mysql://localhost/splitwise";
-	static final String USER = "guest";
-	static final String PASS = "Guest@123+";
+	CustomList parameters = new CustomList();
 	
 
 	
 	
 	public int addUser(User user) throws SQLException {
-		String sql="insert into User(user_name,age,phone_number,gender,email) values('"+user.getName()+"',"
-				+ "'"+user.getAge()+"',"
-						+ "'"+user.getMobileNumber()+"',"
-								+ "'"+user.getGender()+"',"
-										+ "'"+user.getEmailId()+"')";
-			
-		
-	
-		return dm.addRecord(sql);
+		parameters.add("string", "user_name",user.getName());
+		parameters.add("int", "age", user.getAge());
+		parameters.add("string", "phone_number", user.getMobileNumber());
+		parameters.add("string", "gender", user.getGender());
+		parameters.add("string", "email", user.getEmailId());
+		int res= DatabaseManager.addRecord(DatabaseManager.insertSQL(parameters, "User"));
+		parameters.clear();
+		return res;
 	}
 
 	public User getUserById(int id) throws SQLException , UserException {
 		User user = null;
         String sql="select * from User where user_id="+id;
-        ResultSet rs = dm.getRecords(sql);
+        ResultSet rs = DatabaseManager.getRecords(sql);
 		boolean result=rs.next();
 		if(result) {
 			user = new  User(rs.getInt(1),
@@ -52,7 +47,7 @@ public class UserManager  {
 		User user=null;
 		String sql ="select * from User";
 
-		ResultSet rs = dm.getRecords(sql);
+		ResultSet rs = DatabaseManager.getRecords(sql);
 		while(rs.next()) {
 			user = new  User(rs.getInt(1),
 					rs.getString(2),
@@ -64,9 +59,6 @@ public class UserManager  {
 		}
 		return users;
 	}
-	
-	
-	
 }
 
 @SuppressWarnings("serial")

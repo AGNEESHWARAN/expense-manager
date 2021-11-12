@@ -48,12 +48,17 @@ public class Manager extends AbstractManager{
 		return user;
 	}
 	
-	public ArrayList<User> getAllUser(){
+	public void getAllUser(){
 		try {
-			return um.getAllUsers();
+			for(User usr : um.getAllUsers()) {
+				System.out.println(usr.getId()+"\t"+
+						usr.getName()+"\t"+
+						usr.getGender()+"\t"+
+						usr.getMobileNumber());
+			}
 		} catch (Exception e) {
 			System.out.println("No users Fount");
-			return null;
+			
 		}
 	}
 	
@@ -227,5 +232,7 @@ public class Manager extends AbstractManager{
 		return null;
 	}
 	
+	
 }
+
 
